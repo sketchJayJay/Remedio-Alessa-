@@ -1,19 +1,14 @@
-# Remédios da Alessa
+# Remédios da Alessa v11
 
-Versão simples e mobile-first.
-
-## Como usar
-1. Informe o horário.
-2. Digite o nome do remédio e, se quiser, a dose.
-3. Toque em **Adicionar horário**.
-4. Escolha a data de início e a duração do tratamento.
-5. Toque em **Ativar lembretes** e adicione o arquivo gerado ao calendário do celular.
-
-O calendário é a forma usada para avisar no horário mesmo com o app fechado. Se o navegador permitir notificações, o app também pode avisar enquanto estiver aberto.
+Correção definitiva da configuração de horários:
+- os campos de horário não são mais reescritos por nenhuma atualização automática;
+- o que estiver sendo digitado fica protegido em sessionStorage até salvar;
+- o ciclo de 15 segundos atualiza somente o status/alarme;
+- service worker atualizado para v11 com estratégia network-first e limpeza dos caches antigos;
+- CSS e JS usam versão na URL para evitar arquivos antigos presos no navegador/PWA.
 
 ## Coolify
-O `Dockerfile` já está pronto. Faça deploy como Dockerfile e exponha a porta 80.
-
-
-## v10 - correção da configuração no celular
-Os campos de horário não são mais reescritos a cada atualização automática do app. Isso evita o seletor de horário fechar, voltar ou trocar sozinho durante a configuração no iPhone/Android.
+Build Pack: Dockerfile
+Porta: 80
+Base Directory: /
+Sem variáveis de ambiente e sem volume.

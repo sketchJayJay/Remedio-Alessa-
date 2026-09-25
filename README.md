@@ -13,3 +13,7 @@ O calendário é a forma usada para avisar no horário mesmo com o app fechado. 
 
 ## Coolify
 O `Dockerfile` já está pronto. Faça deploy como Dockerfile e exponha a porta 80.
+
+
+## v10 - correção da configuração no celular
+Os campos de horário não são mais reescritos a cada atualização automática do app. Isso evita o seletor de horário fechar, voltar ou trocar sozinho durante a configuração no iPhone/Android.

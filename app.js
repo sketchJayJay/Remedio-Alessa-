@@ -192,8 +192,19 @@ function renderStatus(all){
   }
 }
 
+function fillSettingsForm(){
+  els.six.value=settings.sixHourStart||'';
+  els.eight.value=settings.eightHourStart||'';
+  els.breakfast.value=settings.breakfastTime||'';
+  els.dinner.value=settings.dinnerTime||'';
+  els.start.value=settings.startDate||todayISO();
+  els.days.value=settings.days||14;
+}
+
 function render(){
-  els.six.value=settings.sixHourStart||'';els.eight.value=settings.eightHourStart||'';els.breakfast.value=settings.breakfastTime||'';els.dinner.value=settings.dinnerTime||'';els.start.value=settings.startDate||todayISO();els.days.value=settings.days||14;
+  // Não mexe nos campos de configuração durante as atualizações automáticas.
+  // No iPhone, reatribuir o valor do <input type="time"> enquanto o seletor está
+  // aberto pode fechar/trocar o horário e dá a impressão de que a tela está bugando.
   const all=buildAllOccurrences();
   const groups=todayGroups();
   els.list.innerHTML='';
@@ -281,5 +292,6 @@ els.reminder.addEventListener('click',createReminders);
 els.soundBtn.addEventListener('click',armSound);
 els.takeCurrent.addEventListener('click',()=>{if(currentActionSlots.length)markTaken(currentActionSlots)});
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+fillSettingsForm();
 render();
 setInterval(()=>{render();checkAlarm();},15000);

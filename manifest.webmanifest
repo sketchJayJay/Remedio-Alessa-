@@ -1,0 +1,12 @@
+{
+  "name": "Remédios da Alessa",
+  "short_name": "Remédios",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#171120",
+  "theme_color": "#201732",
+  "description": "Lembretes simples dos horários dos remédios.",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

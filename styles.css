@@ -1,0 +1,66 @@
+:root{
+  --ink:#211a2e;--muted:#6f687b;--primary:#7556ff;--primary2:#9b84ff;
+  --card:rgba(255,255,255,.56);--line:rgba(255,255,255,.42);--shadow:0 14px 36px rgba(22,14,44,.18)
+}
+*{box-sizing:border-box} html{background:#171120}
+body{margin:0;min-height:100vh;min-height:100dvh;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;background:linear-gradient(180deg,rgba(16,10,27,.10),rgba(16,10,27,.38)),url('assets/herois-bacterias.png') center 24%/cover no-repeat;z-index:-2}
+body::after{content:"";position:fixed;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.10));z-index:-1}
+button,input{font:inherit}button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.app{width:100%;max-width:520px;margin:0 auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+.top{min-height:220px;padding:calc(24px + env(safe-area-inset-top)) 18px 28px;display:flex;flex-direction:column;justify-content:flex-end;color:#fff;text-shadow:0 2px 18px rgba(0,0,0,.35)}
+.badge,.label{font-size:10px;font-weight:900;letter-spacing:.12em}.badge{align-self:flex-start;padding:7px 9px;border-radius:999px;background:rgba(255,255,255,.15);backdrop-filter:blur(10px)}
+h1{margin:10px 0 4px;font-size:32px;line-height:1;letter-spacing:-.04em}.top p{margin:0;max-width:350px;font-size:15px;line-height:1.35;font-weight:700}
+main{padding:0 12px 18px}.glass{background:rgba(255,255,255,.56);border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(16px) saturate(1.15)}
+.card,.next-card{border-radius:22px}.next-card{padding:18px;margin-bottom:10px;text-align:center;background:rgba(255,255,255,.64)}
+.label{color:#fff;opacity:.82}.label.dark{color:var(--primary);opacity:1}.next-card .label{display:inline-block;color:var(--primary);background:rgba(238,233,255,.72);padding:6px 9px;border-radius:999px}
+.next-time{font-size:46px;font-weight:950;letter-spacing:-.05em;line-height:1;margin-top:12px}.next-med{margin-top:7px;font-size:16px;font-weight:850;line-height:1.3}.countdown{margin-top:6px;color:var(--muted);font-size:12px;font-weight:750}
+.card{padding:15px;margin-top:10px}h2{margin:3px 0 0;font-size:19px;line-height:1.15;letter-spacing:-.025em}.list-head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:12px}
+.schedule-list{display:grid;gap:8px}.schedule-item{display:grid;grid-template-columns:58px minmax(0,1fr);gap:9px;align-items:center;min-height:66px;padding:10px 12px;border:1px solid rgba(255,255,255,.46);border-radius:16px;background:rgba(255,255,255,.34);backdrop-filter:blur(12px)}
+.time{font-size:19px;font-weight:950;letter-spacing:-.03em}.medicine-wrap{min-width:0;display:grid;gap:2px}.medicine{font-size:13px;line-height:1.25}.dose{font-size:11px;color:var(--muted);font-weight:700}.empty{padding:18px 12px;text-align:center;border:1px dashed rgba(117,86,255,.28);border-radius:16px;color:var(--muted);font-size:13px;line-height:1.4;background:rgba(255,255,255,.24)}
+.setup-copy{margin:0 0 12px;color:#4e4659;font-size:12px;line-height:1.45;font-weight:650}.form-grid{display:grid;gap:9px}.mini-grid{display:grid;grid-template-columns:1fr 100px;gap:9px;margin-top:9px}
+label{display:grid;gap:5px;font-size:11px;font-weight:850;color:#51495e}input{width:100%;height:48px;padding:0 13px;border-radius:14px;border:1px solid rgba(80,65,105,.14);background:rgba(255,255,255,.44);color:var(--ink);font-size:16px;outline:none;backdrop-filter:blur(10px)}input:focus{border-color:#a996ff;box-shadow:0 0 0 3px rgba(117,86,255,.10)}
+.primary,.secondary{width:100%;min-height:50px;margin-top:10px;border-radius:15px;font-weight:900;cursor:pointer}.primary{border:0;color:#fff;background:linear-gradient(135deg,var(--primary),var(--primary2));box-shadow:0 9px 22px rgba(117,86,255,.22)}.secondary{border:1px solid rgba(117,86,255,.16);color:var(--primary);background:rgba(255,255,255,.48)}
+.hint{margin:9px 3px 0;color:#51495e;font-size:11px;line-height:1.45}.med-list{display:grid;gap:8px;margin-top:10px}.med-list>div{display:grid;gap:2px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.30);border:1px solid rgba(255,255,255,.38)}.med-list strong{font-size:13px}.med-list span{font-size:11px;color:#554d61;font-weight:650;line-height:1.35}
+.footer-note{margin:16px 8px 0;text-align:center;color:rgba(255,255,255,.88);font-size:10px;line-height:1.45;text-shadow:0 1px 6px rgba(0,0,0,.35)}
+@media(max-width:360px){.top{min-height:200px}h1{font-size:29px}.next-time{font-size:42px}.mini-grid{grid-template-columns:1fr 90px}}
+
+
+.schedule-list{display:grid;gap:12px}
+.schedule-group{
+  display:grid;
+  gap:8px;
+}
+.schedule-group-head{
+  padding:4px 4px 1px;
+}
+.schedule-group-head strong{
+  display:block;
+  font-size:14px;
+  color:#5e43dc;
+  font-weight:950;
+  letter-spacing:-.01em;
+}
+.schedule-group-head span{
+  display:block;
+  margin-top:2px;
+  font-size:11px;
+  color:var(--muted);
+  font-weight:750;
+}
+.schedule-group + .schedule-group{
+  margin-top:5px;
+  padding-top:12px;
+  border-top:1px solid rgba(94,67,220,.14);
+}
+
+/* v9: confirmação do que já foi tomado + pendência que não some */
+.taken-card{display:grid;grid-template-columns:44px minmax(0,1fr);gap:11px;align-items:center;padding:13px 14px;margin-bottom:10px;border-radius:18px;background:rgba(232,255,242,.64)}
+.status-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:rgba(40,157,96,.16);color:#167c49;font-size:22px;font-weight:950}
+.status-copy{display:grid;gap:2px;min-width:0}.status-copy strong{font-size:15px;line-height:1.2}.status-copy>span:last-child{font-size:11px;color:#5e5668;font-weight:700;line-height:1.3;overflow-wrap:anywhere}
+.next-head{display:flex;justify-content:space-between;align-items:center;gap:8px}.next-label{display:inline-block;color:var(--primary)!important;background:rgba(238,233,255,.72);padding:6px 9px;border-radius:999px}.pending-count{font-size:10px;font-weight:900;color:#a43b38}
+.next-card.overdue{background:rgba(255,239,229,.78);border-color:rgba(225,116,76,.38)}.next-card.overdue .next-label{color:#a43b38!important;background:rgba(255,223,211,.86)}.next-card.overdue .next-time{color:#9d362f}.next-card.overdue .countdown{color:#9d5149;font-weight:850}
+.take-current{width:100%;min-height:48px;margin-top:13px;border:0;border-radius:14px;background:#208c58;color:#fff;font-weight:950;font-size:14px;cursor:pointer}.take-current:active{transform:scale(.99)}.after-next{margin-top:10px;font-size:11px;line-height:1.4;color:#5f566a;font-weight:750}.hidden{display:none!important}
+.alarm-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;margin-bottom:10px;border-radius:18px;background:rgba(255,255,255,.56)}.alarm-card>div{min-width:0}.alarm-card strong{display:block;margin-top:3px;font-size:14px}.alarm-card p{margin:4px 0 0;font-size:10px;line-height:1.35;color:#5e5668;font-weight:700}.sound-btn{flex:0 0 auto;min-height:42px;padding:0 12px;border-radius:13px;border:1px solid rgba(117,86,255,.18);background:rgba(255,255,255,.54);color:var(--primary);font-size:12px;font-weight:900}.sound-btn.active{background:rgba(224,255,238,.76);color:#167c49;border-color:rgba(22,124,73,.16)}
+.schedule-item{grid-template-columns:52px minmax(0,1fr) 68px}.item-status{display:block;margin-top:3px;font-size:10px;font-weight:850;color:#766f82}.schedule-item.pending{background:rgba(255,239,229,.52);border-color:rgba(225,116,76,.30)}.schedule-item.pending .item-status{color:#a43b38}.schedule-item.done{background:rgba(229,255,240,.50);border-color:rgba(40,157,96,.25)}.schedule-item.done .item-status{color:#167c49}.take-btn{min-height:38px;padding:0 8px;border-radius:12px;border:1px solid rgba(117,86,255,.18);background:rgba(255,255,255,.54);color:var(--primary);font-size:11px;font-weight:900;cursor:pointer}.done-btn{color:#167c49;border-color:rgba(22,124,73,.16);background:rgba(229,255,240,.72)}
+@media(max-width:360px){.schedule-item{grid-template-columns:48px minmax(0,1fr) 62px}.take-btn{padding:0 6px;font-size:10px}.alarm-card{align-items:flex-start;flex-direction:column}.sound-btn{width:100%}}

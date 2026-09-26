@@ -4,7 +4,7 @@
 }
 *{box-sizing:border-box} html{background:#171120}
 body{margin:0;min-height:100vh;min-height:100dvh;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
-body::before{content:"";position:fixed;inset:0;background:linear-gradient(180deg,rgba(16,10,27,.10),rgba(16,10,27,.38)),url('assets/herois-bacterias.png') center 24%/cover no-repeat;z-index:-2}
+body::before{content:"";position:fixed;inset:0;background:linear-gradient(180deg,rgba(16,10,27,.10),rgba(16,10,27,.38)),url('herois-bacterias.png') center 24%/cover no-repeat;z-index:-2}
 body::after{content:"";position:fixed;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.10));z-index:-1}
 button,input{font:inherit}button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .app{width:100%;max-width:520px;margin:0 auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
@@ -64,3 +64,8 @@ label{display:grid;gap:5px;font-size:11px;font-weight:850;color:#51495e}input{wi
 .alarm-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;margin-bottom:10px;border-radius:18px;background:rgba(255,255,255,.56)}.alarm-card>div{min-width:0}.alarm-card strong{display:block;margin-top:3px;font-size:14px}.alarm-card p{margin:4px 0 0;font-size:10px;line-height:1.35;color:#5e5668;font-weight:700}.sound-btn{flex:0 0 auto;min-height:42px;padding:0 12px;border-radius:13px;border:1px solid rgba(117,86,255,.18);background:rgba(255,255,255,.54);color:var(--primary);font-size:12px;font-weight:900}.sound-btn.active{background:rgba(224,255,238,.76);color:#167c49;border-color:rgba(22,124,73,.16)}
 .schedule-item{grid-template-columns:52px minmax(0,1fr) 68px}.item-status{display:block;margin-top:3px;font-size:10px;font-weight:850;color:#766f82}.schedule-item.pending{background:rgba(255,239,229,.52);border-color:rgba(225,116,76,.30)}.schedule-item.pending .item-status{color:#a43b38}.schedule-item.done{background:rgba(229,255,240,.50);border-color:rgba(40,157,96,.25)}.schedule-item.done .item-status{color:#167c49}.take-btn{min-height:38px;padding:0 8px;border-radius:12px;border:1px solid rgba(117,86,255,.18);background:rgba(255,255,255,.54);color:var(--primary);font-size:11px;font-weight:900;cursor:pointer}.done-btn{color:#167c49;border-color:rgba(22,124,73,.16);background:rgba(229,255,240,.72)}
 @media(max-width:360px){.schedule-item{grid-template-columns:48px minmax(0,1fr) 62px}.take-btn{padding:0 6px;font-size:10px}.alarm-card{align-items:flex-start;flex-direction:column}.sound-btn{width:100%}}
+
+/* v12: status de notificações push do iPhone */
+.iphone-push-card{background:rgba(245,241,255,.72);border-color:rgba(117,86,255,.22)}
+.iphone-push-card .sound-btn{min-width:118px}
+@media(max-width:390px){.iphone-push-card{align-items:stretch;flex-direction:column}.iphone-push-card .sound-btn{width:100%}}

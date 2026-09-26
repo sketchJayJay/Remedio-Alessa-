@@ -13,7 +13,8 @@
   <title>Remédios da Alessa</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="styles.css?v=11" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="stylesheet" href="styles.css?v=12" />
 </head>
 <body>
   <div class="app">
@@ -45,13 +46,13 @@
         <div id="afterNext" class="after-next"></div>
       </section>
 
-      <section class="alarm-card glass">
+      <section class="alarm-card glass iphone-push-card">
         <div>
-          <span class="label dark">ALARME</span>
-          <strong>Som quando chegar o horário 🔔</strong>
-          <p id="alarmStatus">Toque uma vez para liberar o som neste aparelho.</p>
+          <span class="label dark">IPHONE</span>
+          <strong>Avisar com a tela bloqueada 🔔</strong>
+          <p id="pushStatus">Instale o app na Tela de Início e ative as notificações uma vez.</p>
         </div>
-        <button id="soundBtn" class="sound-btn" type="button">🔊 Ativar som</button>
+        <button id="pushBtn" class="sound-btn" type="button">🔔 Ativar avisos</button>
       </section>
 
       <section class="card glass">
@@ -105,8 +106,8 @@
         </div>
 
         <button id="saveBtn" class="primary">✓ Salvar horários</button>
-        <button id="reminderBtn" class="secondary">🔔 Criar lembretes no celular</button>
-        <p class="hint">Com o app aberto, o alarme sonoro toca no horário. Com o app fechado, os lembretes do calendário usam o aviso do próprio celular.</p>
+        <button id="reminderBtn" class="secondary">📅 Criar também no Calendário</button>
+        <p class="hint">O aviso principal agora é enviado por notificação push e pode aparecer mesmo com o iPhone bloqueado e o app fechado. O Calendário fica como opção extra.</p>
       </section>
 
       <section class="card glass meds-card">
@@ -135,6 +136,6 @@
     </div>
   </template>
 
-  <script src="app.js?v=11"></script>
+  <script src="app.js?v=12"></script>
 </body>
 </html>

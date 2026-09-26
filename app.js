@@ -1,7 +1,9 @@
 const SETTINGS='alessa-fixed-med-settings-v3';
 const TAKEN='alessa-fixed-med-taken-v3';
 const NOTIFIED='alessa-fixed-med-notified-v3';
-const DRAFT='alessa-config-draft-v11';
+const DRAFT='alessa-config-draft-v12';
+const PUSH_ENABLED='alessa-ios-push-enabled-v12';
+const DEVICE_KEY='alessa-ios-device-id-v12';
 
 const meds={
   tetra:{name:'Tetraciclina 500 mg',dose:'1 comprimido/cápsula'},
@@ -16,16 +18,16 @@ const els={
   start:$('startDateInput'),days:$('daysInput'),save:$('saveBtn'),reminder:$('reminderBtn'),list:$('scheduleList'),
   nextCard:$('nextCard'),nextLabel:$('nextLabel'),nextTime:$('nextTime'),nextMedicine:$('nextMedicine'),
   countdown:$('countdown'),pendingCount:$('pendingCount'),takeCurrent:$('takeCurrentBtn'),afterNext:$('afterNext'),
-  lastTakenTime:$('lastTakenTime'),lastTakenMedicine:$('lastTakenMedicine'),soundBtn:$('soundBtn'),alarmStatus:$('alarmStatus')
+  lastTakenTime:$('lastTakenTime'),lastTakenMedicine:$('lastTakenMedicine'),pushBtn:$('pushBtn'),pushStatus:$('pushStatus')
 };
 
 let settings=load(SETTINGS,{sixHourStart:'',eightHourStart:'',breakfastTime:'',dinnerTime:'',startDate:todayISO(),days:14});
 let taken=load(TAKEN,{});
 let notified=load(NOTIFIED,{});
 let currentActionSlots=[];
-let audioCtx=null;
-let soundArmed=false;
-let lastAlarmAt=0;
+let pushEnabled=localStorage.getItem(PUSH_ENABLED)==='1';
+let deviceId=localStorage.getItem(DEVICE_KEY)||'';
+if(!deviceId){deviceId=(crypto.randomUUID?crypto.randomUUID():'dev-'+Date.now()+'-'+Math.random().toString(16).slice(2));localStorage.setItem(DEVICE_KEY,deviceId);}
 
 function clone(v){return JSON.parse(JSON.stringify(v))}
 function load(k,f){try{const v=localStorage.getItem(k);return v?JSON.parse(v):clone(f)}catch{return clone(f)}}
@@ -90,12 +92,14 @@ function markTaken(slots){
   save(TAKEN,taken);
   renderSchedule();
   refreshLive();
+  if(pushEnabled) syncPushSchedule(false);
 }
 function unmarkTaken(slot){
   delete taken[slot.id];
   save(TAKEN,taken);
   renderSchedule();
   refreshLive();
+  if(pushEnabled) syncPushSchedule(false);
 }
 
 function combineSameTime(slots){
@@ -267,57 +271,114 @@ function saveSettings(showMessage=true){
   clearDraft();
   renderSchedule();
   refreshLive();
+  if(pushEnabled) syncPushSchedule(false);
   if(showMessage) alert('Horários salvos certinho.');
   return true;
 }
 
-async function armSound(){
+function urlBase64ToUint8Array(base64String){
+  const padding='='.repeat((4-base64String.length%4)%4);
+  const base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
+  const rawData=atob(base64);
+  return Uint8Array.from([...rawData].map(c=>c.charCodeAt(0)));
+}
+
+function isStandalone(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true;
+}
+function isIOS(){return /iphone|ipad|ipod/i.test(navigator.userAgent)}
+
+function getPushSchedule(){
+  if(!configured())return [];
+  const pending=buildAllOccurrences().filter(slot=>!isTaken(slot));
+  return combineSameTime(pending).map(group=>({
+    id:String(group.stamp),
+    stamp:group.stamp,
+    title:`💊 ${group.time} • Hora do remédio`,
+    body:medText(group)
+  }));
+}
+
+async function getRegistration(){
+  if(!('serviceWorker' in navigator))throw new Error('service-worker');
+  const reg=await navigator.serviceWorker.register('sw.js?v=12',{updateViaCache:'none'});
+  await reg.update().catch(()=>{});
+  return navigator.serviceWorker.ready;
+}
+
+async function syncPushSchedule(showMessage=false){
+  if(!pushEnabled||!configured())return false;
   try{
-    const AC=window.AudioContext||window.webkitAudioContext;
-    if(!AC){els.alarmStatus.textContent='Este navegador não libera alarme sonoro do app.';return}
-    if(!audioCtx)audioCtx=new AC();
-    if(audioCtx.state==='suspended')await audioCtx.resume();
-    soundArmed=true;
-    els.soundBtn.textContent='🔊 Som ativado';els.soundBtn.classList.add('active');
-    els.alarmStatus.textContent='Alarme armado. Enquanto o app estiver aberto, ele toca no horário.';
-    playAlarm(false);
-    if('Notification'in window&&Notification.permission==='default'){try{await Notification.requestPermission()}catch{}}
-  }catch{els.alarmStatus.textContent='Não foi possível liberar o som neste navegador.';}
+    const res=await fetch('/api/schedule',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({deviceId,schedule:getPushSchedule()})});
+    if(!res.ok){
+      if(res.status===404){pushEnabled=false;localStorage.removeItem(PUSH_ENABLED);updatePushStatus('As notificações precisam ser ativadas novamente.');}
+      return false;
+    }
+    if(showMessage)alert('Cronograma dos avisos atualizado no iPhone.');
+    return true;
+  }catch{return false}
 }
 
-function tone(freq,start,duration,volume=.12){
-  if(!audioCtx)return;
-  const osc=audioCtx.createOscillator();const gain=audioCtx.createGain();
-  osc.type='square';osc.frequency.setValueAtTime(freq,start);gain.gain.setValueAtTime(0.0001,start);gain.gain.exponentialRampToValueAtTime(volume,start+.02);gain.gain.exponentialRampToValueAtTime(0.0001,start+duration);
-  osc.connect(gain);gain.connect(audioCtx.destination);osc.start(start);osc.stop(start+duration+.03);
-}
-function playAlarm(full=true){
-  if(!soundArmed||!audioCtx)return;
-  const base=audioCtx.currentTime+.03;const repeats=full?8:2;
-  for(let i=0;i<repeats;i++)tone(i%2?740:980,base+i*.32,.20,full?.16:.07);
-  if(navigator.vibrate&&full)navigator.vibrate([250,120,250,120,400]);
+function updatePushStatus(custom=''){
+  if(!els.pushStatus||!els.pushBtn)return;
+  if(custom){els.pushStatus.textContent=custom;return}
+  if(pushEnabled){
+    els.pushStatus.textContent='Avisos ativos. O iPhone pode notificar mesmo bloqueado e com o app fechado.';
+    els.pushBtn.textContent='✓ Avisos ativos';
+    els.pushBtn.classList.add('active');
+  }else{
+    els.pushStatus.textContent=isIOS()&&!isStandalone()?'No Safari: Compartilhar → Adicionar à Tela de Início. Depois abra pelo ícone.':'Toque para permitir notificações e enviar um teste.';
+    els.pushBtn.textContent='🔔 Ativar avisos';
+    els.pushBtn.classList.remove('active');
+  }
 }
 
-async function showOpenNotification(group){
-  if(!('Notification'in window)||Notification.permission!=='granted')return;
+async function enableIphonePush(){
+  if(isIOS()&&!isStandalone()){
+    alert('No iPhone, primeiro abra no Safari, toque em Compartilhar e escolha “Adicionar à Tela de Início”. Depois abra o app pelo novo ícone e toque em “Ativar avisos”.');
+    updatePushStatus();
+    return;
+  }
+  if(!('Notification' in window)||!('PushManager' in window)){
+    alert('Este navegador não oferece notificações push para este app. No iPhone, abra pelo ícone adicionado à Tela de Início.');
+    return;
+  }
   try{
-    const body=medText(group);
-    if('serviceWorker'in navigator){const reg=await navigator.serviceWorker.ready;await reg.showNotification('🔔 Hora do remédio',{body,icon:'icon.svg',tag:`alessa-${group.stamp}`,renotify:true});}
-    else new Notification('🔔 Hora do remédio',{body,icon:'icon.svg'});
-  }catch{}
+    const reg=await getRegistration();
+    const permission=await Notification.requestPermission();
+    if(permission!=='granted'){
+      updatePushStatus('Permissão de notificações não foi liberada no iPhone.');
+      return;
+    }
+    const keyRes=await fetch('/api/vapid-public-key',{cache:'no-store'});
+    if(!keyRes.ok)throw new Error('vapid');
+    const {publicKey}=await keyRes.json();
+    let subscription=await reg.pushManager.getSubscription();
+    if(!subscription){
+      subscription=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(publicKey)});
+    }
+    const res=await fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({deviceId,subscription,schedule:getPushSchedule()})});
+    if(!res.ok)throw new Error('subscribe');
+    pushEnabled=true;localStorage.setItem(PUSH_ENABLED,'1');updatePushStatus();
+    await fetch('/api/test-push',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({deviceId})}).catch(()=>{});
+    alert('Pronto! Enviei uma notificação de teste. Deixe “Sons” ativado em Ajustes → Notificações para ouvir o aviso com a tela bloqueada.');
+  }catch(err){
+    console.error(err);
+    updatePushStatus('Não consegui ativar agora. Confira se abriu o app pelo ícone da Tela de Início e tente novamente.');
+  }
 }
 
-function checkAlarm(){
-  if(!configured())return;
-  const all=buildAllOccurrences();const now=new Date();
-  const dueGroups=combineSameTime(all.filter(s=>!isTaken(s)&&s.dateISO===todayISO()&&s.stamp<=now.getTime()));
-  if(!dueGroups.length)return;
-  const due=dueGroups[dueGroups.length-1];
-  const lateMs=now.getTime()-due.stamp;
-  if(lateMs>60*60*1000)return;
-  const key=`${todayISO()}_${due.stamp}`;
-  if(!notified[key]){notified[key]=Date.now();save(NOTIFIED,notified);showOpenNotification(due);}
-  if(soundArmed&&Date.now()-lastAlarmAt>=60000){lastAlarmAt=Date.now();playAlarm(true);}
+async function restorePushState(){
+  updatePushStatus();
+  if(!pushEnabled)return;
+  try{
+    const reg=await getRegistration();
+    const sub=await reg.pushManager.getSubscription();
+    if(!sub){pushEnabled=false;localStorage.removeItem(PUSH_ENABLED);updatePushStatus();return;}
+    const res=await fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({deviceId,subscription:sub,schedule:getPushSchedule()})});
+    if(!res.ok)throw new Error('restore');
+    updatePushStatus();
+  }catch{updatePushStatus('Avisos salvos no iPhone, mas o servidor não respondeu agora.');}
 }
 
 function icsEscape(s){return String(s).replace(/\\/g,'\\\\').replace(/,/g,'\\,').replace(/;/g,'\\;').replace(/\n/g,'\\n')}
@@ -331,7 +392,7 @@ function createReminders(){
   combined.forEach((slot,i)=>{
     const title='🔔 REMÉDIO '+slot.time+' • '+medText(slot);
     ics+='BEGIN:VEVENT\r\n';
-    ics+=`UID:alessa-v11-${i}-${slot.stamp}@lembretes\r\nDTSTAMP:${stamp}\r\n`;
+    ics+=`UID:alessa-v12-${i}-${slot.stamp}@lembretes\r\nDTSTAMP:${stamp}\r\n`;
     ics+=`DTSTART:${icsDate(slot.dt)}\r\n`;
     ics+=`SUMMARY:${icsEscape(title)}\r\nDESCRIPTION:${icsEscape('Hora do remédio: '+medText(slot))}\r\n`;
     ics+='BEGIN:VALARM\r\nTRIGGER:PT0M\r\nACTION:DISPLAY\r\nDESCRIPTION:🔔 Hora do remédio\r\nEND:VALARM\r\nEND:VEVENT\r\n';
@@ -350,22 +411,23 @@ function createReminders(){
 
 els.save.addEventListener('click',()=>saveSettings(true));
 els.reminder.addEventListener('click',createReminders);
-els.soundBtn.addEventListener('click',armSound);
+els.pushBtn.addEventListener('click',enableIphonePush);
 els.takeCurrent.addEventListener('click',()=>{if(currentActionSlots.length)markTaken(currentActionSlots)});
 
 fillSettingsFormOnce();
 renderSchedule();
 refreshLive();
+restorePushState();
 
 // A atualização automática mexe SOMENTE no status do tratamento e no alarme.
 // Os inputs de configuração ficam completamente fora deste ciclo.
-setInterval(()=>{refreshLive();checkAlarm();},15000);
+setInterval(()=>{refreshLive();},15000);
 
 // Atualiza o service worker e evita que uma versão antiga continue presa no celular.
 if('serviceWorker' in navigator){
   window.addEventListener('load',async()=>{
     try{
-      const reg=await navigator.serviceWorker.register('sw.js?v=11',{updateViaCache:'none'});
+      const reg=await navigator.serviceWorker.register('sw.js?v=12',{updateViaCache:'none'});
       await reg.update();
     }catch{}
   });
